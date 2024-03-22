@@ -100,9 +100,9 @@ func main() {
 			c.AbortWithStatus(http.StatusOK) //but send back 200 ok to the server, acknowledge
 			return
 		}
-		if res.Action != "created" {
+		if res.Action != "published" {
 			log.WithFields(log.Fields{
-				"expected": "created",
+				"expected": "published",
 				"got":      res.Action,
 			}).Error("Is only scheduled to run when new release is created")
 			c.AbortWithStatus(http.StatusOK) //but send back 200 ok to the server, acknowledge
@@ -128,7 +128,8 @@ func main() {
 			return
 		}
 		for _, de := range fi {
-			log.Info(de.Info())
+			info, _ := de.Info()
+			log.Debug(info.Name())
 		}
 		c.AbortWithStatus(http.StatusOK)
 	})
