@@ -9,6 +9,29 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type ReleaseInfo struct {
+	Body       string `json:"body"`
+	CreatedAt  string `json:"created_at"`
+	Draft      bool   `json:"draft"`
+	PreRelease bool   `json:"prerelease"`
+	Tag        string `json:"tag_name"`
+}
+type RepoInfo struct {
+	Name          string `json:"name"`
+	CloneUrl      string `json:"clone_url"`
+	DefaultBranch string `json:"default_branch"`
+}
+
+type SenderInfo struct {
+}
+
+type WebHkRelease struct { // payload we receive from web hook notification
+	Action     string      `json:"action"`
+	Release    ReleaseInfo `json:"release"`
+	Repository RepoInfo    `json:"repository"`
+	Sender     SenderInfo  `json:"sender"`
+}
+
 func CORS(c *gin.Context) {
 	// First, we add the headers with need to enable CORS
 	// Make sure to adjust these headers to your needs
@@ -41,7 +64,7 @@ func main() {
 			c.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
-		res := map[string]interface{}{}
+		res := WebHkRelease{}
 		err = json.Unmarshal(byt, &res)
 		if err != nil {
 			fmt.Println("Error unmarshaling the payload")
@@ -50,9 +73,7 @@ func main() {
 			return
 		}
 		fmt.Println("received payload from github..")
-		for k, v := range res {
-			fmt.Printf("%s:%v\n", k, v)
-		}
+		fmt.Println(res)
 		c.AbortWithStatus(http.StatusOK)
 	})
 	r.Run(":8082")
