@@ -50,7 +50,9 @@ func main() {
 			return
 		}
 		fmt.Println("received payload from github..")
-		fmt.Println(res)
+		for k, v := range res {
+			fmt.Printf("%s:%v\n", k, v)
+		}
 		c.AbortWithStatus(http.StatusOK)
 	})
 	r.Run(":8082")
