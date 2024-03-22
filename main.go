@@ -60,6 +60,7 @@ func CORS(c *gin.Context) {
 func init() {
 	log.SetFormatter(&log.TextFormatter{DisableColors: false, FullTimestamp: false})
 	log.SetReportCaller(false)
+	log.SetLevel(log.DebugLevel)
 
 	REPO_NAME = os.Getenv("REPO_NAME")
 	if REPO_NAME == "" {
@@ -127,9 +128,8 @@ func main() {
 			c.AbortWithStatus(http.StatusOK) //but send back 200 ok to the server, acknowledge
 			return
 		}
-		for _, de := range fi {
-			info, _ := de.Info()
-			log.Debug(info.Name())
+		for _, entry := range fi {
+			log.Debug(entry.Name())
 		}
 		c.AbortWithStatus(http.StatusOK)
 	})
