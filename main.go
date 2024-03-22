@@ -100,6 +100,14 @@ func main() {
 			c.AbortWithStatus(http.StatusOK) //but send back 200 ok to the server, acknowledge
 			return
 		}
+		if res.Action != "created" {
+			log.WithFields(log.Fields{
+				"expected": "created",
+				"got":      res.Action,
+			}).Error("Is only scheduled to run when new release is created")
+			c.AbortWithStatus(http.StatusOK) //but send back 200 ok to the server, acknowledge
+			return
+		}
 		// changing the current directory before executing the other bash scripts
 		if err := os.Chdir(REPO_DIR_ONHOST); err != nil {
 			log.WithFields(log.Fields{
@@ -108,6 +116,19 @@ func main() {
 			}).Error("Error changing to the working directory on the host")
 			c.AbortWithStatus(http.StatusOK) //but send back 200 ok to the server, acknowledge
 			return
+		}
+		log.Info("Changed to directory..")
+		fi, err := os.ReadDir(REPO_DIR_ONHOST)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"expected": "file information for the repo directory",
+				"err":      err,
+			}).Error("Error changing to the working directory on the host")
+			c.AbortWithStatus(http.StatusOK) //but send back 200 ok to the server, acknowledge
+			return
+		}
+		for _, de := range fi {
+			log.Info(de.Info())
 		}
 		c.AbortWithStatus(http.StatusOK)
 	})
