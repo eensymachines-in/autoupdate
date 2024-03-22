@@ -17,6 +17,7 @@ services:
     volumes:
       - .:${SRCDIR}
       - ${DIRREPO_HOST}:${DIRREPO_CTN}
+      - ~/.ssh:~/.ssh
     environment:
       - FLOG=0
       - SILENT=0
