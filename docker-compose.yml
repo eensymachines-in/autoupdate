@@ -15,10 +15,13 @@ services:
       - 8082:8082 
     volumes:
       - .:${SRCDIR}
+      - /var/autodeploy/repo:${DIRREPO_HOST}
     environment:
       - FLOG=0
       - SILENT=0
       - GINMODE=DEBUG
+      - REPO_NAME=${REPONAME}
+      - REPO_DIR=/var/autodeploy/repo
     container_name: ctn_gin
     stdin_open: true
     entrypoint: ["${BINDIR}/${APPNAME}"]

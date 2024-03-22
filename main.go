@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 )
 
 type ReleaseInfo struct {
@@ -30,6 +32,11 @@ type WebHkRelease struct { // payload we receive from web hook notification
 	Sender     SenderInfo  `json:"sender"`
 }
 
+var (
+	REPO_NAME       = "" // expected repository name
+	REPO_DIR_ONHOST = "" // directory on the host where the git repo is located
+)
+
 func CORS(c *gin.Context) {
 	// First, we add the headers with need to enable CORS
 	// Make sure to adjust these headers to your needs
@@ -47,9 +54,30 @@ func CORS(c *gin.Context) {
 		// request using any other method than OPTIONS
 		c.AbortWithStatus(http.StatusOK)
 	}
+
+}
+
+func init() {
+	log.SetFormatter(&log.TextFormatter{DisableColors: false, FullTimestamp: false})
+	log.SetReportCaller(false)
+
+	REPO_NAME = os.Getenv("REPO_NAME")
+	if REPO_NAME == "" {
+		log.Panic("Empty environment variable: REPO_NAME")
+	}
+	REPO_DIR_ONHOST = os.Getenv("REPO_DIR")
+	if REPO_NAME == "" {
+		log.Panic("Empty environment variable: REPO_DIR_ONHOST")
+	}
 }
 
 func main() {
+	log.Info("=========")
+	log.Info("Starting the auto deploy service..")
+	log.Info("=========")
+
+	defer log.Warn("Now closing the patio-web program...")
+
 	gin.SetMode(gin.DebugMode)
 	r := gin.Default()
 	api := r.Group("/api")
@@ -58,15 +86,29 @@ func main() {
 		res := WebHkRelease{}
 		err := c.ShouldBind(&res)
 		defer c.Request.Body.Close()
-
 		if err != nil {
 			fmt.Println("Error unmarshaling the payload")
 			fmt.Println(err)
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
-		fmt.Println("received payload from github..")
-		fmt.Println(res)
+		if REPO_NAME != res.Repository.Name {
+			log.WithFields(log.Fields{
+				"expected": REPO_NAME,
+				"got":      res.Repository.Name,
+			}).Error("Repository name isnt as expected, did you change the repository name upstream?")
+			c.AbortWithStatus(http.StatusOK) //but send back 200 ok to the server, acknowledge
+			return
+		}
+		// changing the current directory before executing the other bash scripts
+		if err := os.Chdir(REPO_DIR_ONHOST); err != nil {
+			log.WithFields(log.Fields{
+				"expected": REPO_DIR_ONHOST,
+				"err":      err,
+			}).Error("Error changing to the working directory on the host")
+			c.AbortWithStatus(http.StatusOK) //but send back 200 ok to the server, acknowledge
+			return
+		}
 		c.AbortWithStatus(http.StatusOK)
 	})
 	r.Run(":8082")

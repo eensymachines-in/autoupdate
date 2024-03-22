@@ -2,7 +2,10 @@ module github.com/eensymachines-in/autoupdate
 
 go 1.21.0
 
-require github.com/gin-gonic/gin v1.9.1
+require (
+	github.com/gin-gonic/gin v1.9.1
+	github.com/sirupsen/logrus v1.9.3
+)
 
 require (
 	github.com/bytedance/sonic v1.9.1 // indirect
