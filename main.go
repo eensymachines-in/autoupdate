@@ -1,9 +1,7 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -57,15 +55,10 @@ func main() {
 	api := r.Group("/api")
 	api.Use(CORS).POST("/test", func(c *gin.Context) {
 		fmt.Println("We have received hook notification..")
-		byt, err := io.ReadAll(c.Request.Body)
-		if err != nil {
-			fmt.Println("Error reading the request payload")
-			fmt.Println(err)
-			c.AbortWithStatus(http.StatusBadRequest)
-			return
-		}
 		res := WebHkRelease{}
-		err = json.Unmarshal(byt, &res)
+		err := c.ShouldBind(&res)
+		defer c.Request.Body.Close()
+
 		if err != nil {
 			fmt.Println("Error unmarshaling the payload")
 			fmt.Println(err)
