@@ -2,7 +2,7 @@ version: '3.1'
 
 services:
   srv_gin:
-    build: 
+    build:
       context: .
       args:
         - SRC=${SRCDIR}
@@ -13,10 +13,10 @@ services:
         - APPNAME=${APPNAME}
         - REPODIR=${DIRREPO_CTN}
     ports:
-      - 8082:8082 
+      - 8082:8082
     volumes:
       - .:${SRCDIR}
-      - ${DIRREPO_CTN}:${DIRREPO_HOST}
+      - ${DIRREPO_HOST}:${DIRREPO_CTN}
     environment:
       - FLOG=0
       - SILENT=0
@@ -25,5 +25,4 @@ services:
       - REPO_DIR=${DIRREPO_CTN}
     container_name: ctn_gin
     stdin_open: true
-    entrypoint: ["${BINDIR}/${APPNAME}"]
-  
+    entrypoint: [ "${BINDIR}/${APPNAME}" ]
