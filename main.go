@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"os/exec"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -131,6 +132,19 @@ func main() {
 		for _, entry := range fi {
 			log.Debug(entry.Name())
 		}
+		// bin/sh only for alpine linux, for any other flavour this shall change
+		cmd := exec.Command("/bin/sh", "-c", fmt.Sprintf("git pull origin %s", res.Repository.DefaultBranch))
+		stdout, err := cmd.Output()
+		if err != nil {
+			log.WithFields(log.Fields{
+				"expected": "No error when pulling git repo",
+				"err":      err,
+			}).Error("Error pulling from git repo")
+			c.AbortWithStatus(http.StatusOK) //but send back 200 ok to the server, acknowledge
+			return
+		}
+		log.Debug("pulled git repo..")
+		log.Debug(string(stdout))
 		c.AbortWithStatus(http.StatusOK)
 	})
 	r.Run(":8082")
