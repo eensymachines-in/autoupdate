@@ -8,8 +8,9 @@ ARG RUN
 ARG ETC 
 ARG BIN
 ARG APPNAME
+ARG REPODIR
 RUN apk add git
-RUN mkdir -p ${SRC} && mkdir -p ${LOG} && mkdir -p ${RUN} && mkdir -p ${ETC} && mkdir -p ${BIN}
+RUN mkdir -p ${SRC} && mkdir -p ${LOG} && mkdir -p ${RUN} && mkdir -p ${ETC} && mkdir -p ${BIN} && mkdir -p ${REPODIR}
 WORKDIR ${SRC}
 # # getting  all the shells to an executable location
 # COPY ./shells/ ${BIN} 
