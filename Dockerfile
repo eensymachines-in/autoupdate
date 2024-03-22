@@ -9,7 +9,7 @@ ARG ETC
 ARG BIN
 ARG APPNAME
 ARG REPODIR
-RUN apk add git
+RUN apk add git openssh
 RUN mkdir -p ${SRC} && mkdir -p ${LOG} && mkdir -p ${RUN} && mkdir -p ${ETC} && mkdir -p ${BIN} && mkdir -p ${REPODIR}
 WORKDIR ${SRC}
 # # getting  all the shells to an executable location
