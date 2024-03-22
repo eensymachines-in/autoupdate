@@ -1,0 +1,25 @@
+version: '3.1'
+
+services:
+  srv_gin:
+    build: 
+      context: .
+      args:
+        - SRC=${SRCDIR}
+        - LOG=${LOGDIR}
+        - RUN=${RUNDIR}
+        - ETC=${ETCDIR}
+        - BIN=${BINDIR}
+        - APPNAME=${APPNAME}
+    ports:
+      - 8082:8080 
+    volumes:
+      - .:${SRCDIR}
+    environment:
+      - FLOG=0
+      - SILENT=0
+      - GINMODE=DEBUG
+    container_name: ctn_gin
+    stdin_open: true
+    entrypoint: ["${BINDIR}/${APPNAME}"]
+  
