@@ -25,6 +25,11 @@ services:
       - REPO_NAME=${REPONAME}
       - REPO_DIR=${DIRREPO_CTN}
     container_name: ctn_gin
+    # relation with the host 
+    # We want commands to run on the host but from within the container
     stdin_open: true
+    tty: true
     privileged: true
+    pid: "host"
+    # How does the container start
     entrypoint: [ "${BINDIR}/${APPNAME}" ]
