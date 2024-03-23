@@ -143,8 +143,21 @@ func main() {
 			c.AbortWithStatus(http.StatusOK) //but send back 200 ok to the server, acknowledge
 			return
 		}
-		log.Debug("pulled git repo..")
-		log.Debug(string(stdout))
+		log.Debugf("pulled git repo..\n%s", string(stdout))
+		cmd = exec.Command("/bin/sh", "-c", fmt.Sprintf("git checkout %s", res.Repository.DefaultBranch))
+		_, err = cmd.Output()
+		if err != nil {
+			log.WithFields(log.Fields{
+				"expected": "No error when switching branch",
+				"err":      err,
+			}).Error("Error switching branch on the repo")
+			c.AbortWithStatus(http.StatusOK) //but send back 200 ok to the server, acknowledge
+			return
+		}
+		log.Debugf("Switched to branch %s", res.Repository.DefaultBranch)
+
+		// Either systemctl commands , docker-compose commands, or plain go build and run commands.
+		
 		c.AbortWithStatus(http.StatusOK)
 	})
 	r.Run(":8082")

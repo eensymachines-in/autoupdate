@@ -16,8 +16,8 @@ services:
       - 8082:8082
     volumes:
       - .:${SRCDIR}
-      - ${DIRREPO_HOST}:${DIRREPO_CTN}
-      - /root/.ssh:/root/.ssh
+      - ${DIRREPO_HOST}:${DIRREPO_CTN} # repo that needs updation is mounted on the container
+      - /root/.ssh:/root/.ssh # when running git repo, ssh key of the host percolate to ctn
     environment:
       - FLOG=0
       - SILENT=0
@@ -26,4 +26,5 @@ services:
       - REPO_DIR=${DIRREPO_CTN}
     container_name: ctn_gin
     stdin_open: true
+    privileged: true
     entrypoint: [ "${BINDIR}/${APPNAME}" ]
